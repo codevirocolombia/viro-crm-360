@@ -1,5 +1,5 @@
 class Conversations::AssignmentService
-  MAX_ACTIVE_ASSIGNMENTS = 5
+  DEFAULT_ACTIVE_ASSIGNMENTS_LIMIT = 5
   ACTIVE_ASSIGNMENT_STATUSES = %i[open pending snoozed].freeze
 
   class AssignmentError < StandardError; end
@@ -84,17 +84,20 @@ def ensure_conversation_available_for!(new_assignee)
 end
   
   def ensure_assignee_has_capacity!(new_assignee)
-    return if unlimited_assignment_user?(new_assignee)
+  return if unlimited_assignment_user?(new_assignee)
 
-    active_count = conversation.account.conversations
-                               .where(assignee_id: new_assignee.id, status: ACTIVE_ASSIGNMENT_STATUSES)
-                               .where.not(id: conversation.id)
-                               .count
+  account_user = account_user_for(new_assignee)
+  limit = account_user&.conversation_assignment_limit || DEFAULT_ACTIVE_ASSIGNMENTS_LIMIT
 
-    return if active_count < MAX_ACTIVE_ASSIGNMENTS
+  active_count = conversation.account.conversations
+                             .where(assignee_id: new_assignee.id, status: ACTIVE_ASSIGNMENT_STATUSES)
+                             .where.not(id: conversation.id)
+                             .count
 
-    raise AssignmentError, 'El agente ya tiene 5 conversaciones activas asignadas'
-  end
+  return if active_count < limit
+
+  raise AssignmentError, "El agente ya tiene #{limit} conversaciones activas asignadas"
+end
 
   def actor_can_override_assignment?
   return false if actor.blank?

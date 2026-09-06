@@ -6,6 +6,7 @@ import {
 
 import account from './account/account.routes';
 import agentAccess from './agentAccess/agentAccess.routes';
+import agentConversationLimits from './agentConversationLimits/agentConversationLimits.routes';
 import agent from './agents/agent.routes';
 import assignmentPolicy from './assignmentPolicy/assignmentPolicy.routes';
 import agentBot from './agentBots/agentBot.routes';
@@ -50,6 +51,7 @@ export default {
     ...account.routes,
     ...agent.routes,
     ...agentAccess.routes,
+    ...agentConversationLimits.routes,
     ...assignmentPolicy.routes,
     ...agentBot.routes,
     ...attributes.routes,

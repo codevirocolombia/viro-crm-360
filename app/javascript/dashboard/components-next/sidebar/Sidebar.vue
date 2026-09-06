@@ -661,11 +661,18 @@ const menuItems = computed(() => {
         //   icon: 'i-woot-captain',
         //   to: accountScopedRoute('captain_settings_index'),
         // },
-        {
+{
   name: 'Settings Agents',
   label: t('SIDEBAR.AGENTS'),
   icon: 'i-lucide-square-user',
   to: accountScopedRoute('agent_list'),
+},
+{
+  name: 'Settings Agent Access',
+  label: 'Control de acceso',
+  icon: 'i-lucide-calendar-clock',
+  activeOn: ['agent_access_settings_index'],
+  to: accountScopedRoute('agent_access_settings_index'),
 },
 {
   name: 'Settings Agent Conversation Limits',

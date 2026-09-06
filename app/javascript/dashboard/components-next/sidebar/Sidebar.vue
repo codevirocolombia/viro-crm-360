@@ -668,11 +668,11 @@ const menuItems = computed(() => {
   to: accountScopedRoute('agent_list'),
 },
 {
-  name: 'Settings Agent Access',
-  label: 'Control de acceso',
-  icon: 'i-lucide-calendar-clock',
-  activeOn: ['agent_access_settings_index'],
-  to: accountScopedRoute('agent_access_settings_index'),
+  name: 'Settings Agent Conversation Limits',
+  label: 'Límites de conversaciones',
+  icon: 'i-lucide-list-checks',
+  activeOn: ['agent_conversation_limits_index'],
+  to: accountScopedRoute('agent_conversation_limits_index'),
 },
 {
   name: 'Settings Teams',

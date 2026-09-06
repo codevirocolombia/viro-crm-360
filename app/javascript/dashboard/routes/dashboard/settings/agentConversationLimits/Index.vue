@@ -62,7 +62,7 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
         <div
           v-for="agent in visibleUsers"
           :key="agent.id"
-          class="flex items-center justify-between gap-4 py-4"
+          class="grid grid-cols-[minmax(0,1fr)_80px] items-center gap-4 py-4"
         >
           <div class="flex items-center gap-4 min-w-0">
             <Avatar
@@ -84,14 +84,14 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
 
           <span
           v-if="agent.role === 'supervisor'"
-          class="w-20 text-center text-sm font-medium text-n-slate-11"
+          class="w-20 justify-self-end text-center text-sm font-medium text-n-slate-11"
             >
               Supervisor
           </span>
 
           <select
             v-else
-            class="h-9 rounded-lg border border-n-weak bg-n-alpha-1 px-3 text-sm text-n-slate-12 outline-none"
+            class="w-20 h-8 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
             :value="agent.conversation_assignment_limit || 5"
             :disabled="isUpdating(agent.id)"
             @change="updateLimit(agent, $event)"

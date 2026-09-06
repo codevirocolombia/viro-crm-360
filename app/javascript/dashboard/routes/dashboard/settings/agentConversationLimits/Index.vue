@@ -83,10 +83,10 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
           </div>
 
           <span
-            v-if="agent.role === 'supervisor'"
-            class="text-sm font-medium text-n-slate-11"
-          >
-            Supervisor
+          v-if="agent.role === 'supervisor'"
+          class="w-20 text-center text-sm font-medium text-n-slate-11"
+            >
+              Supervisor
           </span>
 
           <select

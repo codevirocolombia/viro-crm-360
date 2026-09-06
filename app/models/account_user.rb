@@ -41,6 +41,8 @@ class AccountUser < ApplicationRecord
   after_save :update_presence_in_redis, if: :saved_change_to_availability?
 
   validates :user_id, uniqueness: { scope: :account_id }
+  validates :conversation_assignment_limit,
+          numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 20 }
 
   def create_notification_setting
     setting = user.notification_settings.new(account_id: account.id)

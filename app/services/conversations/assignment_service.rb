@@ -87,7 +87,9 @@ end
   return if unlimited_assignment_user?(new_assignee)
 
   account_user = account_user_for(new_assignee)
-  limit = account_user&.conversation_assignment_limit || DEFAULT_ACTIVE_ASSIGNMENTS_LIMIT
+  limit = account_user&.conversation_assignment_limit
+
+  return if limit.blank?
 
   active_count = conversation.account.conversations
                              .where(assignee_id: new_assignee.id, status: ACTIVE_ASSIGNMENT_STATUSES)

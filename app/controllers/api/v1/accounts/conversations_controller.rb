@@ -34,9 +34,7 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
                                 .per(ATTACHMENT_RESULTS_PER_PAGE)
   end
 
-  def show
-    auto_assign_conversation_on_view
-  end
+  def show; end
 
   def create
     ActiveRecord::Base.transaction do
@@ -181,8 +179,6 @@ end
   end
 
   def update_last_seen
-  auto_assign_conversation_on_view
-
   Notification::MarkConversationReadService.new(user: Current.user, account: Current.account, conversation: @conversation).perform
   return update_last_seen_on_conversation(DateTime.now.utc, true) if assignee? && @conversation.assignee_unread_messages.any?
   return update_last_seen_on_conversation(DateTime.now.utc, false) if !assignee? && @conversation.unread_messages.any?
@@ -215,6 +211,10 @@ end
     return unless should_auto_assign_conversation_on_view?
 
     assign_conversation
+  end
+
+  def auto_assign_on_current_action?
+    action_name.in?(%w[show update_last_seen])
   end
 
   def should_auto_assign_conversation_on_view?
@@ -266,10 +266,11 @@ end
     nil
   end
 
-  def conversation
-    @conversation ||= Current.account.conversations.find_by!(display_id: params[:id])
-    authorize @conversation, :show?
-  end
+def conversation
+  @conversation ||= Current.account.conversations.find_by!(display_id: params[:id])
+  auto_assign_conversation_on_view if auto_assign_on_current_action?
+  authorize @conversation, :show?
+end
 
   def inbox
     return if params[:inbox_id].blank?

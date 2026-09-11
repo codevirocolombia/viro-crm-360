@@ -42,7 +42,12 @@ class AccountUser < ApplicationRecord
 
   validates :user_id, uniqueness: { scope: :account_id }
   validates :conversation_assignment_limit,
-          numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 20 }
+          numericality: {
+            only_integer: true,
+            greater_than_or_equal_to: 1,
+            less_than_or_equal_to: 20
+          },
+          allow_nil: true
 
   def create_notification_setting
     setting = user.notification_settings.new(account_id: account.id)

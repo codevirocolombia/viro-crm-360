@@ -24,7 +24,13 @@ class Api::V1::Accounts::AgentsController < Api::V1::Accounts::BaseController
 
   def update
     @agent.update!(agent_params.slice(:name).compact)
-    @agent.current_account_user.update!(agent_params.slice(*account_user_attributes).compact)
+    account_user_params = agent_params.slice(*account_user_attributes).compact
+
+if agent_params.key?(:conversation_assignment_limit)
+  account_user_params[:conversation_assignment_limit] = agent_params[:conversation_assignment_limit]
+end
+
+@agent.current_account_user.update!(account_user_params)
   end
 
   def destroy

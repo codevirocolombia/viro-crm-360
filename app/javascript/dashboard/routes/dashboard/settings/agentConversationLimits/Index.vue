@@ -100,7 +100,7 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
 
           <select
             v-else
-            class="grid grid-cols-[minmax(0,1fr)_112px] items-center gap-4 py-4"
+            class="w-28 h-8 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
             :value="agent.conversation_assignment_limit ?? ''"
             :disabled="isUpdating(agent.id)"
             @change="updateLimit(agent, $event)"

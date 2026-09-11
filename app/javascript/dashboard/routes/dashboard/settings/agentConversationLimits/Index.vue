@@ -15,16 +15,25 @@ const visibleUsers = computed(() =>
   agents.value.filter(agent => agent.role !== 'administrator')
 );
 
-const limitOptions = computed(() =>
-  Array.from({ length: 20 }, (_, index) => index + 1)
-);
-
+const limitOptions = computed(() => [
+  ...Array.from({ length: 20 }, (_, index) => ({
+    label: String(index + 1),
+    value: index + 1,
+  })),
+  {
+    label: 'Sin límite',
+    value: '',
+  },
+]);
 onMounted(() => {
   store.dispatch('agents/get');
 });
 
 const updateLimit = async (agent, event) => {
-  const conversationAssignmentLimit = Number(event.target.value);
+  const selectedValue = event.target.value;
+  const conversationAssignmentLimit =
+    selectedValue === '' ? null : Number(selectedValue);
+
   updatingAgentIds.value.push(agent.id);
 
   try {
@@ -91,14 +100,18 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
 
           <select
             v-else
-            class="w-20 h-8 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
-            :value="agent.conversation_assignment_limit || 5"
+            class="grid grid-cols-[minmax(0,1fr)_112px] items-center gap-4 py-4"
+            :value="agent.conversation_assignment_limit ?? ''"
             :disabled="isUpdating(agent.id)"
             @change="updateLimit(agent, $event)"
           >
-            <option v-for="limit in limitOptions" :key="limit" :value="limit">
-              {{ limit }}
-            </option>
+<option
+  v-for="limit in limitOptions"
+  :key="limit.value === '' ? 'unlimited' : limit.value"
+  :value="limit.value"
+>
+  {{ limit.label }}
+</option>
           </select>
         </div>
       </div>

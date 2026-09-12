@@ -268,6 +268,7 @@ end
 
 def conversation
   @conversation ||= Current.account.conversations.find_by!(display_id: params[:id])
+  auto_assign_conversation_on_view if auto_assign_on_current_action?
   authorize @conversation, :show?
 end
 

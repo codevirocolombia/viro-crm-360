@@ -8,7 +8,7 @@ class Conversations::PermissionFilterService
   end
 
   def perform
-    return conversations if user_role == 'administrator'
+    return conversations if user_role.in?(%w[administrator supervisor])
 
     accessible_conversations
   end
@@ -16,7 +16,15 @@ class Conversations::PermissionFilterService
   private
 
   def accessible_conversations
-    conversations.where(inbox: user.inboxes.where(account_id: account.id))
+    assigned_conversations.or(participating_conversations)
+  end
+
+  def assigned_conversations
+    conversations.where(assignee_id: user.id)
+  end
+
+  def participating_conversations
+    conversations.where(id: user.participating_conversations.where(account_id: account.id).select(:id))
   end
 
   def account_user

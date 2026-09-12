@@ -16,15 +16,7 @@ class Conversations::PermissionFilterService
   private
 
   def accessible_conversations
-    assigned_conversations.or(participating_conversations)
-  end
-
-  def assigned_conversations
-    conversations.where(assignee_id: user.id)
-  end
-
-  def participating_conversations
-    conversations.where(id: user.participating_conversations.where(account_id: account.id).select(:id))
+    conversations.where(inbox: user.inboxes.where(account_id: account.id))
   end
 
   def account_user

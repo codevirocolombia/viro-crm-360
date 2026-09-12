@@ -38,8 +38,8 @@ const actions = {
       const response = await ConversationApi.show(conversationId);
       commit(types.UPDATE_CONVERSATION, response.data);
       commit(`contacts/${types.SET_CONTACT_ITEM}`, response.data.meta.sender);
-    } catch (error) {
-      // Ignore error
+        } catch (error) {
+      throw error;
     }
   },
 
@@ -100,8 +100,8 @@ const actions = {
       if (!payload.length) {
         commit(types.SET_ALL_MESSAGES_LOADED, data.conversationId);
       }
-    } catch (error) {
-      // Handle error
+        } catch (error) {
+      throw error;
     }
   },
 

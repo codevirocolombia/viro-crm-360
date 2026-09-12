@@ -152,8 +152,10 @@ export default {
         return;
       }
       const chat = this.findConversation();
-      if (!chat) {
-        this.$store.dispatch('getConversation', this.conversationId);
+            if (!chat) {
+        this.$store
+          .dispatch('getConversation', this.conversationId)
+          .catch(error => this.handleConversationOpenError(error));
       }
     },
     findConversation() {
@@ -184,7 +186,43 @@ export default {
       } else {
         this.$store.dispatch('clearSelectedState');
       }
+              .then(() => {
+            emitter.emit(BUS_EVENTS.SCROLL_TO_MESSAGE, { messageId });
+          })
+          .catch(error => this.handleConversationOpenError(error));
     },
+
+        handleConversationOpenError(error) {
+      const message =
+        error?.response?.data?.error ||
+        'Ya llegaste al cupo máximo de conversaciones asignadas';
+
+      useAlert(message);
+      this.$store.dispatch('clearSelectedState');
+      this.$router.replace(this.conversationListRoute()).catch(() => {});
+    },
+    conversationListRoute() {
+      const routesWithoutConversation = {
+        inbox_conversation: 'home',
+        conversation_through_inbox: 'inbox_dashboard',
+        conversations_through_label: 'label_conversations',
+        conversations_through_team: 'team_conversations',
+        conversations_through_folders: 'folder_conversations',
+        conversation_through_mentions: 'conversation_mentions',
+        conversation_through_unattended: 'conversation_unattended',
+        conversation_through_participating: 'conversation_participating',
+      };
+
+      const params = { ...this.$route.params, accountId: this.accountId };
+      delete params.conversation_id;
+      delete params.conversationId;
+
+      return {
+        name: routesWithoutConversation[this.$route.name] || 'home',
+        params,
+      };
+    },
+    
     onSearch() {
       this.showSearchModal = true;
     },

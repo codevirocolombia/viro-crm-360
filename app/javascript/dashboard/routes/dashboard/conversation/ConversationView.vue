@@ -163,18 +163,19 @@ export default {
       const [chat] = this.chatList.filter(c => c.id === conversationId);
       return chat;
     },
-    setActiveChat() {
+        setActiveChat() {
       if (this.conversationId) {
         const selectedConversation = this.findConversation();
-        // If conversation doesn't exist or selected conversation is same as the active
-        // conversation, don't set active conversation.
+
         if (
           !selectedConversation ||
           selectedConversation.id === this.currentChat.id
         ) {
           return;
         }
+
         const { messageId } = this.$route.query;
+
         this.$store
           .dispatch('setActiveChat', {
             data: selectedConversation,
@@ -182,14 +183,11 @@ export default {
           })
           .then(() => {
             emitter.emit(BUS_EVENTS.SCROLL_TO_MESSAGE, { messageId });
-          });
+          })
+          .catch(error => this.handleConversationOpenError(error));
       } else {
         this.$store.dispatch('clearSelectedState');
       }
-              .then(() => {
-            emitter.emit(BUS_EVENTS.SCROLL_TO_MESSAGE, { messageId });
-          })
-          .catch(error => this.handleConversationOpenError(error));
     },
 
         handleConversationOpenError(error) {

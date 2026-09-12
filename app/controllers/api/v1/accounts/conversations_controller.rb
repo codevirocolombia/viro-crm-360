@@ -207,23 +207,30 @@ end
 
   private
 
-  def auto_assign_conversation_on_view
-    return unless should_auto_assign_conversation_on_view?
+  def ensure_conversation_accessible_on_open!
+    return unless action_name.in?(%w[show update_last_seen])
+    return unless Current.user.is_a?(User)
+    return unless Current.account_user&.agent?
+    return if @conversation.assignee_id == Current.user.id
 
-    assign_conversation
+    if @conversation.assignee_id.present?
+      render json: { error: 'Esta conversación ya está asignada a otro agente' }, status: :forbidden
+      return
+    end
+
+    return unless @conversation.status == 'open'
+
+    assign_conversation_for_view
+  rescue Conversations::AssignmentService::AssignmentError => e
+    render json: { error: e.message }, status: :forbidden
   end
 
-  def auto_assign_on_current_action?
-    action_name.in?(%w[show update_last_seen])
-  end
-
-  def should_auto_assign_conversation_on_view?
-  account_user = Current.account_user
-
-  Current.user.is_a?(User) &&
-    (account_user&.agent? || account_user&.supervisor?) &&
-    @conversation.status == 'open' &&
-    @conversation.assignee_id.blank?
+  def assign_conversation_for_view
+    Conversations::AssignmentService.new(
+      conversation: @conversation,
+      assignee_id: current_user.id,
+      actor: Current.user
+    ).perform
   end
 
   def permitted_update_params
@@ -268,7 +275,9 @@ end
 
 def conversation
   @conversation ||= Current.account.conversations.find_by!(display_id: params[:id])
-  auto_assign_conversation_on_view if auto_assign_on_current_action?
+  ensure_conversation_accessible_on_open!
+  return if performed?
+
   authorize @conversation, :show?
 end
 

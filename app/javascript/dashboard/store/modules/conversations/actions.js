@@ -191,20 +191,36 @@ const actions = {
     });
   },
 
-  async setActiveChat({ commit, dispatch }, { data, after }) {
-    commit(types.SET_CURRENT_CHAT_WINDOW, data);
-    commit(types.CLEAR_ALL_MESSAGES_LOADED, data.id);
-    if (data.dataFetched === undefined) {
-      try {
+    async setActiveChat({ commit, dispatch }, { data, after }) {
+    try {
+      const response = await ConversationApi.show(data.id);
+      const conversation = {
+        ...data,
+        ...response.data,
+        messages: data.messages || response.data.messages || [],
+      };
+
+      commit(types.UPDATE_CONVERSATION, response.data);
+
+      if (response.data.meta?.sender) {
+        commit(`contacts/${types.SET_CONTACT_ITEM}`, response.data.meta.sender);
+      }
+
+      commit(types.SET_CURRENT_CHAT_WINDOW, conversation);
+      commit(types.CLEAR_ALL_MESSAGES_LOADED, conversation.id);
+
+      if (conversation.dataFetched === undefined) {
+        const [firstMessage] = conversation.messages || [];
         await dispatch('fetchPreviousMessages', {
           after,
-          before: data.messages[0].id,
-          conversationId: data.id,
+          before: firstMessage?.id,
+          conversationId: conversation.id,
         });
-        commit(types.SET_CHAT_DATA_FETCHED, data.id);
-      } catch (error) {
-        // Ignore error
+        commit(types.SET_CHAT_DATA_FETCHED, conversation.id);
       }
+    } catch (error) {
+      commit(types.CLEAR_CURRENT_CHAT_WINDOW);
+      throw error;
     }
   },
 

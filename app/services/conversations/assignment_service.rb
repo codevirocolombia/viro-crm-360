@@ -98,7 +98,7 @@ end
 
   return if active_count < limit
 
-  raise AssignmentError, "El agente ya tiene #{limit} conversaciones activas asignadas"
+  raise AssignmentError, "Ya llegaste al cupo máximo de #{limit} conversaciones asignadas"
 end
 
   def actor_can_override_assignment?

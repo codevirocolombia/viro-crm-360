@@ -57,6 +57,7 @@ const saveConfiguration = async () => {
     };
 
     useAlert('Configuración actualizada correctamente');
+    setTimeout(() => window.location.reload(), 800);
   } catch (error) {
     useAlert(
       error?.response?.data?.error ||

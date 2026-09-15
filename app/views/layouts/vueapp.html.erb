@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <title>CRM Santa Maria</title>
+      <title><%= @global_config['INSTALLATION_NAME'].presence || 'VIRO CRM 360' %></title>
+      <% favicon_url = @global_config['LOGO_THUMBNAIL'].presence || '/brand-assets/logo_thumbnail.svg' %>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0"/>
     <% if @global_config['DISPLAY_MANIFEST'] %>
       <meta name="msapplication-TileColor" content="#1f93ff">
@@ -26,7 +27,7 @@
       <link class="favicon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=crm-gloria-1">
       <link rel="manifest" href="/manifest.json">
     <% end %>
-    <link rel="icon" type="image/svg+xml" href="/brand-assets/logo_thumbnail.svg?v=crm-gloria-1">
+    <link rel="icon" href="<%= favicon_url %>">
     <%= csrf_meta_tags %>
     <script>
       window.chatwootConfig = {

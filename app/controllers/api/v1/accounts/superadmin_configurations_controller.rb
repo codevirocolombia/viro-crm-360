@@ -1,3 +1,5 @@
+require 'base64'
+
 class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts::BaseController
   before_action :ensure_superadmin!
 
@@ -6,6 +8,13 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
     logo: 'LOGO',
     logo_dark: 'LOGO_DARK',
     logo_thumbnail: 'LOGO_THUMBNAIL'
+  }.freeze
+
+  DEFAULT_CONFIG = {
+    installation_name: 'VIRO CRM 360',
+    logo: '/brand-assets/logo.svg',
+    logo_dark: '/brand-assets/logo_dark.svg',
+    logo_thumbnail: '/brand-assets/logo_thumbnail.svg'
   }.freeze
 
   IMAGE_PARAMS = %i[logo logo_dark logo_thumbnail].freeze
@@ -24,7 +33,18 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
 
   def update
     update_installation_name
+    return if performed?
+
     update_images
+    return if performed?
+
+    render json: current_config_payload
+  end
+
+  def reset
+    DEFAULT_CONFIG.each do |key, value|
+      update_config(CONFIG_KEYS[key], value)
+    end
 
     render json: current_config_payload
   end

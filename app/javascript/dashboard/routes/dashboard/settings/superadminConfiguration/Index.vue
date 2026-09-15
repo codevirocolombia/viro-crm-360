@@ -7,6 +7,7 @@ import superadminConfigurationAPI from 'dashboard/api/superadminConfiguration';
 
 const isLoading = ref(false);
 const isSaving = ref(false);
+const isResetting = ref(false);
 
 const form = ref({
   installation_name: '',
@@ -20,6 +21,28 @@ const files = ref({
   logo_dark: null,
   logo_thumbnail: null,
 });
+
+const assetFields = [
+  {
+    key: 'logo',
+    title: 'Logo black',
+    description: 'Se usa en fondos claros y pantallas principales.',
+    previewClass: 'bg-white',
+  },
+  {
+    key: 'logo_dark',
+    title: 'Logo white',
+    description: 'Se usa en fondos oscuros como el login.',
+    previewClass: 'bg-black',
+  },
+  {
+    key: 'logo_thumbnail',
+    title: 'Favicon',
+    description: 'Se usa en la pestaña del navegador y logo compacto.',
+    previewClass: 'bg-white',
+    isFavicon: true,
+  },
+];
 
 const loadConfiguration = async () => {
   isLoading.value = true;
@@ -35,6 +58,10 @@ const loadConfiguration = async () => {
 const handleFileChange = (key, event) => {
   const [file] = event.target.files || [];
   files.value[key] = file || null;
+};
+
+const reloadAfterChange = () => {
+  setTimeout(() => window.location.reload(), 800);
 };
 
 const saveConfiguration = async () => {
@@ -57,7 +84,7 @@ const saveConfiguration = async () => {
     };
 
     useAlert('Configuración actualizada correctamente');
-    setTimeout(() => window.location.reload(), 800);
+    reloadAfterChange();
   } catch (error) {
     useAlert(
       error?.response?.data?.error ||
@@ -66,6 +93,37 @@ const saveConfiguration = async () => {
     );
   } finally {
     isSaving.value = false;
+  }
+};
+
+const resetConfiguration = async () => {
+  const confirmed = window.confirm(
+    '¿Seguro que quieres restaurar el nombre, logos y favicon por defecto?'
+  );
+
+  if (!confirmed) return;
+
+  isResetting.value = true;
+
+  try {
+    const response = await superadminConfigurationAPI.reset();
+    form.value = response.data;
+    files.value = {
+      logo: null,
+      logo_dark: null,
+      logo_thumbnail: null,
+    };
+
+    useAlert('Configuración restaurada correctamente');
+    reloadAfterChange();
+  } catch (error) {
+    useAlert(
+      error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        'No se pudo restaurar la configuración'
+    );
+  } finally {
+    isResetting.value = false;
   }
 };
 
@@ -86,70 +144,96 @@ onMounted(loadConfiguration);
 
     <template #body>
       <form
-        class="flex flex-col gap-6 border-t border-n-weak pt-6 w-full max-w-3xl"
+        class="flex flex-col gap-6 border-t border-n-weak pt-6 w-full max-w-4xl"
         @submit.prevent="saveConfiguration"
       >
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-medium text-n-slate-12">Nombre del CRM</span>
-          <input
-            v-model="form.installation_name"
-            type="text"
-            class="h-10 rounded-md border border-n-weak bg-n-alpha-2 px-3 text-sm text-n-slate-12"
-          />
-        </label>
+        <section class="rounded-lg border border-n-weak bg-n-solid-1 p-5">
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-n-slate-12">
+              Nombre del CRM
+            </span>
+            <input
+              v-model="form.installation_name"
+              type="text"
+              class="h-10 rounded-md border border-n-weak bg-n-alpha-2 px-3 text-sm text-n-slate-12 outline-none focus:border-n-brand"
+            />
+          </label>
+        </section>
 
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-medium text-n-slate-12">Logo black</span>
-          <img
-            v-if="form.logo"
-            :src="form.logo"
-            class="h-14 w-fit max-w-xs rounded border border-n-weak bg-white p-2"
-          />
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/svg+xml,image/webp"
-            class="text-sm text-n-slate-11"
-            @change="handleFileChange('logo', $event)"
-          />
-        </label>
+        <section class="grid grid-cols-1 gap-4">
+          <article
+            v-for="asset in assetFields"
+            :key="asset.key"
+            class="grid grid-cols-1 gap-4 rounded-lg border border-n-weak bg-n-solid-1 p-5 md:grid-cols-[180px_minmax(0,1fr)_190px] md:items-center"
+          >
+            <div>
+              <h2 class="text-sm font-semibold text-n-slate-12">
+                {{ asset.title }}
+              </h2>
+              <p class="mt-1 text-xs leading-5 text-n-slate-11">
+                {{ asset.description }}
+              </p>
+            </div>
 
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-medium text-n-slate-12">Logo white</span>
-          <img
-            v-if="form.logo_dark"
-            :src="form.logo_dark"
-            class="h-14 w-fit max-w-xs rounded border border-n-weak bg-black p-2"
-          />
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/svg+xml,image/webp"
-            class="text-sm text-n-slate-11"
-            @change="handleFileChange('logo_dark', $event)"
-          />
-        </label>
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="flex items-center justify-center rounded-md border border-n-weak p-3"
+                :class="[
+                  asset.previewClass,
+                  asset.isFavicon ? 'size-16' : 'h-20 w-40',
+                ]"
+              >
+                <img
+                  v-if="form[asset.key]"
+                  :src="form[asset.key]"
+                  :class="asset.isFavicon ? 'size-10 object-contain' : 'max-h-14 max-w-32 object-contain'"
+                />
+              </div>
 
-        <label class="flex flex-col gap-2">
-          <span class="text-sm font-medium text-n-slate-12">Favicon</span>
-          <img
-            v-if="form.logo_thumbnail"
-            :src="form.logo_thumbnail"
-            class="size-12 rounded border border-n-weak bg-white p-2"
-          />
-          <input
-            type="file"
-            accept="image/png,image/jpeg,image/svg+xml,image/webp,image/x-icon"
-            class="text-sm text-n-slate-11"
-            @change="handleFileChange('logo_thumbnail', $event)"
-          />
-        </label>
+              <div class="min-w-0">
+                <p class="truncate text-sm font-medium text-n-slate-12">
+                  {{ files[asset.key]?.name || 'Archivo actual' }}
+                </p>
+                <p class="text-xs text-n-slate-11">
+                  PNG, JPG, SVG, WEBP o ICO
+                </p>
+              </div>
+            </div>
 
-        <div>
+            <div class="flex md:justify-end">
+              <input
+                :id="`superadmin-${asset.key}`"
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp,image/x-icon"
+                class="hidden"
+                @change="handleFileChange(asset.key, $event)"
+              />
+              <label
+                :for="`superadmin-${asset.key}`"
+                class="inline-flex h-9 cursor-pointer items-center justify-center rounded-md border border-n-weak bg-n-alpha-2 px-3 text-sm font-medium text-n-slate-12 transition-colors hover:bg-n-alpha-3"
+              >
+                Seleccionar archivo
+              </label>
+            </div>
+          </article>
+        </section>
+
+        <div class="flex flex-wrap items-center gap-3">
           <button
             type="submit"
             class="h-10 rounded-md bg-[#1f93ff] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#1a7edb] disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="isSaving"
+            :disabled="isSaving || isResetting"
           >
             {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+
+          <button
+            type="button"
+            class="h-10 rounded-md border border-n-weak bg-n-alpha-2 px-4 text-sm font-semibold text-n-slate-12 transition-colors hover:bg-n-alpha-3 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="isSaving || isResetting"
+            @click="resetConfiguration"
+          >
+            {{ isResetting ? 'Restaurando...' : 'Restaurar valores por defecto' }}
           </button>
         </div>
       </form>

@@ -10,7 +10,7 @@ const globalConfig = useMapGetter('globalConfig/get');
   <img
     v-if="globalConfig.logoThumbnail"
     v-bind="attrs"
-    :src="`${globalConfig.logoThumbnail}?v=crm-santa-maria-2`"
+    :src="globalConfig.logoThumbnail"
   />
   <svg
     v-else

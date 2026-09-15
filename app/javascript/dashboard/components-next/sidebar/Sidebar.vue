@@ -45,6 +45,8 @@ const isACustomBrandedInstance = useMapGetter(
   'globalConfig/isACustomBrandedInstance'
 );
 const isRTL = useMapGetter('accounts/isRTL');
+const currentUser = useMapGetter('getCurrentUser');
+const isSuperAdmin = computed(() => currentUser.value?.type === 'SuperAdmin');
 
 const { width: windowWidth } = useWindowSize();
 const isMobile = computed(() => windowWidth.value < 768);
@@ -681,6 +683,17 @@ const menuItems = computed(() => {
   activeOn: ['agent_conversation_limits_index'],
   to: accountScopedRoute('agent_conversation_limits_index'),
 },
+...(isSuperAdmin.value
+  ? [
+      {
+        name: 'Settings Superadmin Configuration',
+        label: 'Configuración Superadmin',
+        icon: 'i-lucide-shield-cog',
+        activeOn: ['superadmin_configuration_index'],
+        to: accountScopedRoute('superadmin_configuration_index'),
+      },
+    ]
+  : []),
 {
   name: 'Settings Teams',
   label: t('SIDEBAR.TEAMS'),

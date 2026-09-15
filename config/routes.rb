@@ -67,6 +67,7 @@ Rails.application.routes.draw do
             delete 'sessions/:session_id', action: :destroy_session
             end
           end
+          resource :superadmin_configuration, only: [:show, :update]
           namespace :captain do
             resource :preferences, only: [:show, :update]
             resources :assistants do

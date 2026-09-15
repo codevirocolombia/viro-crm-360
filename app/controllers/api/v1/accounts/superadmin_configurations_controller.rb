@@ -9,6 +9,14 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
   }.freeze
 
   IMAGE_PARAMS = %i[logo logo_dark logo_thumbnail].freeze
+  ALLOWED_IMAGE_CONTENT_TYPES = %w[
+    image/png
+    image/jpeg
+    image/svg+xml
+    image/webp
+    image/x-icon
+    image/vnd.microsoft.icon
+  ].freeze
 
   def show
     render json: current_config_payload
@@ -33,11 +41,7 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
     return unless params.key?(:installation_name)
 
     name = params[:installation_name].to_s.strip
-
-    if name.blank?
-      render_could_not_create_error('El nombre del CRM no puede estar vacío')
-      return
-    end
+    return render_could_not_create_error('El nombre del CRM no puede estar vacío') if name.blank?
 
     update_config('INSTALLATION_NAME', name)
   end
@@ -47,13 +51,12 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
       file = params[param_name]
       next if file.blank?
 
-      blob = ActiveStorage::Blob.create_and_upload!(
-        io: file.tempfile,
-        filename: file.original_filename,
-        content_type: file.content_type
-      )
+      unless ALLOWED_IMAGE_CONTENT_TYPES.include?(file.content_type)
+        return render_could_not_create_error('Solo se permiten imágenes PNG, JPG, SVG, WEBP o ICO')
+      end
 
-      update_config(CONFIG_KEYS[param_name], rails_blob_path(blob, only_path: true))
+      encoded_file = Base64.strict_encode64(file.read)
+      update_config(CONFIG_KEYS[param_name], "data:#{file.content_type};base64,#{encoded_file}")
     end
   end
 

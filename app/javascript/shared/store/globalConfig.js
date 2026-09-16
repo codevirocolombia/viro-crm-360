@@ -25,6 +25,9 @@ const {
   DISABLE_USER_PROFILE_UPDATE: disableUserProfileUpdate,
   DEPLOYMENT_ENV: deploymentEnv,
   ACTIVE_PLATFORM_BANNERS: activePlatformBanners,
+  CRM_FEATURE_CONVERSATION_LIMITS_ENABLED: crmFeatureConversationLimitsEnabled,
+  CRM_FEATURE_AGENT_ACCESS_ENABLED: crmFeatureAgentAccessEnabled,
+  CRM_FEATURE_KANBAN_ENABLED: crmFeatureKanbanEnabled,
 } = window.globalConfig || {};
 
 const state = {
@@ -51,6 +54,18 @@ const state = {
   widgetBrandURL,
   isEnterprise: parseBoolean(isEnterprise),
   activePlatformBanners: activePlatformBanners || [],
+  crmFeatureConversationLimitsEnabled:
+  crmFeatureConversationLimitsEnabled === undefined
+    ? true
+    : parseBoolean(crmFeatureConversationLimitsEnabled),
+crmFeatureAgentAccessEnabled:
+  crmFeatureAgentAccessEnabled === undefined
+    ? true
+    : parseBoolean(crmFeatureAgentAccessEnabled),
+crmFeatureKanbanEnabled:
+  crmFeatureKanbanEnabled === undefined
+    ? true
+    : parseBoolean(crmFeatureKanbanEnabled),
 };
 
 export const getters = {

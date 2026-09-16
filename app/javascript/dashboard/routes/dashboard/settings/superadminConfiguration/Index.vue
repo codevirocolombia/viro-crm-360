@@ -14,6 +14,9 @@ const form = ref({
   logo: '',
   logo_dark: '',
   logo_thumbnail: '',
+  conversation_limits_enabled: true,
+  agent_access_enabled: true,
+  kanban_enabled: true,
 });
 
 const files = ref({
@@ -44,6 +47,24 @@ const assetFields = [
   },
 ];
 
+const featureFields = [
+  {
+    key: 'conversation_limits_enabled',
+    title: 'Límites de conversaciones',
+    description: 'Activa o desactiva los límites de conversaciones por agente.',
+  },
+  {
+    key: 'agent_access_enabled',
+    title: 'Control de acceso',
+    description: 'Activa o desactiva horarios permitidos y sesiones por agente.',
+  },
+  {
+    key: 'kanban_enabled',
+    title: 'Kanban',
+    description: 'Activa o desactiva la vista Kanban del CRM.',
+  },
+];
+
 const loadConfiguration = async () => {
   isLoading.value = true;
 
@@ -69,6 +90,9 @@ const saveConfiguration = async () => {
 
   const formData = new FormData();
   formData.append('installation_name', form.value.installation_name || '');
+  featureFields.forEach(feature => {
+  formData.append(feature.key, form.value[feature.key] ? 'true' : 'false');
+});
 
   Object.entries(files.value).forEach(([key, file]) => {
     if (file) formData.append(key, file);
@@ -217,6 +241,48 @@ onMounted(loadConfiguration);
             </div>
           </article>
         </section>
+
+        <section class="rounded-lg border border-n-weak bg-n-solid-1 p-5">
+  <div class="mb-4">
+    <h2 class="text-sm font-semibold text-n-slate-12">
+      Funciones del CRM
+    </h2>
+    <p class="mt-1 text-xs leading-5 text-n-slate-11">
+      Activa o desactiva módulos completos para esta instalación.
+    </p>
+  </div>
+
+  <div class="divide-y divide-n-weak">
+    <div
+      v-for="feature in featureFields"
+      :key="feature.key"
+      class="flex items-center justify-between gap-4 py-4"
+    >
+      <div>
+        <h3 class="text-sm font-semibold text-n-slate-12">
+          {{ feature.title }}
+        </h3>
+        <p class="mt-1 text-xs leading-5 text-n-slate-11">
+          {{ feature.description }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        role="switch"
+        :aria-checked="form[feature.key]"
+        class="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors"
+        :class="form[feature.key] ? 'bg-[#1f93ff]' : 'bg-n-alpha-3'"
+        @click="form[feature.key] = !form[feature.key]"
+      >
+        <span
+          class="inline-block size-5 rounded-full bg-white transition-transform"
+          :class="form[feature.key] ? 'translate-x-6' : 'translate-x-1'"
+        />
+      </button>
+    </div>
+  </div>
+</section>
 
         <div class="flex flex-wrap items-center gap-3">
           <button

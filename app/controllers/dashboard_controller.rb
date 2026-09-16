@@ -24,6 +24,9 @@ class DashboardController < ActionController::Base
     DISABLE_USER_PROFILE_UPDATE
     DEPLOYMENT_ENV
     INSTALLATION_PRICING_PLAN
+    CRM_FEATURE_CONVERSATION_LIMITS_ENABLED
+    CRM_FEATURE_AGENT_ACCESS_ENABLED
+    CRM_FEATURE_KANBAN_ENABLED
   ].freeze
 
   before_action :set_application_pack

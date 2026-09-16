@@ -55,18 +55,21 @@
   display_title: 'Chatwoot Metadata'
   description: 'Display default Chatwoot metadata like favicons and upgrade warnings'
   type: boolean
-  - name: CRM_FEATURE_CONVERSATION_LIMITS_ENABLED
+
+- name: CRM_FEATURE_CONVERSATION_LIMITS_ENABLED
   value: true
   display_title: 'Límites de conversaciones'
   description: 'Activa o desactiva los límites de conversaciones por agente.'
   locked: false
   type: boolean
+
 - name: CRM_FEATURE_AGENT_ACCESS_ENABLED
   value: true
   display_title: 'Control de acceso'
   description: 'Activa o desactiva los horarios y sesiones permitidas por agente.'
   locked: false
   type: boolean
+
 - name: CRM_FEATURE_KANBAN_ENABLED
   value: true
   display_title: 'Kanban'

@@ -207,23 +207,29 @@ end
 
   private
 
-  def ensure_conversation_accessible_on_open!
-    return unless action_name.in?(%w[show update_last_seen])
-    return unless Current.user.is_a?(User)
-    return unless Current.account_user&.agent?
-    return if @conversation.assignee_id == Current.user.id
+def ensure_conversation_accessible_on_open!
+  return unless action_name.in?(%w[show update_last_seen])
+  return unless Current.user.is_a?(User)
 
-    if @conversation.assignee_id.present?
-      render json: { error: 'Esta conversación ya está asignada a otro agente' }, status: :forbidden
-      return
-    end
+  account_user = Current.account_user
+  return unless account_user&.agent? || account_user&.supervisor?
+  return if @conversation.assignee_id == Current.user.id
 
-    return unless @conversation.status == 'open'
+  if @conversation.assignee_id.present?
+    # El supervisor puede abrir conversaciones asignadas a otros agentes,
+    # sin modificar su asignación.
+    return if account_user.supervisor?
 
-    assign_conversation_for_view
-  rescue Conversations::AssignmentService::AssignmentError => e
-    render json: { error: e.message }, status: :forbidden
+    render json: { error: 'Esta conversación ya está asignada a otro agente' }, status: :forbidden
+    return
   end
+
+  return unless @conversation.status == 'open'
+
+  assign_conversation_for_view
+rescue Conversations::AssignmentService::AssignmentError => e
+  render json: { error: e.message }, status: :forbidden
+end
 
   def assign_conversation_for_view
     Conversations::AssignmentService.new(

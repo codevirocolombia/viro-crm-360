@@ -14,7 +14,7 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
   }.freeze
 
   DEFAULT_CONFIG = {
-    installation_name: 'VIRO CRM 360',
+    installation_name: 'CRM VIRO 360',
     logo: '/brand-assets/logo.svg',
     logo_dark: '/brand-assets/logo_dark.svg',
     logo_thumbnail: '/brand-assets/logo_thumbnail.svg',

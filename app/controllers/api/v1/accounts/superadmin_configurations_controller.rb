@@ -64,7 +64,7 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
     render json: current_config_payload
   end
 
-  private
+    private
 
   def ensure_superadmin!
     return if Current.user.is_a?(SuperAdmin)
@@ -95,20 +95,24 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
       next if file.blank?
 
       unless ALLOWED_IMAGE_CONTENT_TYPES.include?(file.content_type)
-        return render_could_not_create_error('Solo se permiten imágenes PNG, JPG, SVG, WEBP o ICO')
+        return render_could_not_create_error(
+          'Solo se permiten imágenes PNG, JPG, SVG, WEBP o ICO'
+        )
       end
 
       encoded_file = Base64.strict_encode64(file.read)
-      update_config(CONFIG_KEYS[param_name], "data:#{file.content_type};base64,#{encoded_file}")
+      update_config(
+        CONFIG_KEYS[param_name],
+        "data:#{file.content_type};base64,#{encoded_file}"
+      )
     end
   end
 
   def update_config(name, value)
-  config = InstallationConfig.find_or_initialize_by(name: name)
-  config.locked = false
-  config.value = value
-  config.save!
-end
+    config = InstallationConfig.find_or_initialize_by(name: name)
+    config.locked = false
+    config.value = value
+    config.save!
   end
 
   def current_config_payload

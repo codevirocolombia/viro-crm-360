@@ -29,6 +29,7 @@ import profile from './profile/profile.routes';
 //import security from './security/security.routes';
 import conversationWorkflow from './conversationWorkflow/conversationWorkflow.routes';
 //import captain from './captain/captain.routes';
+import callCenter from './callCenter/callCenter.routes';
 
 export default {
   routes: [
@@ -53,6 +54,7 @@ export default {
     ...agent.routes,
     ...agentAccess.routes,
     ...agentConversationLimits.routes,
+    ...callCenter.routes,
     ...superadminConfiguration.routes,
     ...assignmentPolicy.routes,
     //...agentBot.routes,

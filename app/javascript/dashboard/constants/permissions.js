@@ -7,7 +7,12 @@ export const AVAILABLE_CUSTOM_ROLE_PERMISSIONS = [
   'knowledge_base_manage',
 ];
 
-export const ROLES = ['agent', 'administrator', 'supervisor'];
+export const ROLES = [
+  'agent',
+  'administrator',
+  'supervisor',
+  'call_center',
+];
 
 export const CONVERSATION_PERMISSIONS = [
   'conversation_manage',

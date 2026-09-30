@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
 
             <button
               type="submit"
-              class="h-10 rounded-md bg-[#1f93ff] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              class="mt-[26px] h-10 rounded-md bg-[#1f93ff] px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               :disabled="isSaving"
             >
               {{ isSaving ? 'Guardando...' : 'Guardar' }}

@@ -66,6 +66,7 @@ def ensure_current_user_can_reply
   return if @conversation.assignee_id == Current.user.id
   return if Current.account_user&.administrator?
   return if Current.account_user&.supervisor?
+  return if Current.account_user&.call_center?
 
   render json: {
     error: 'Solo el agente asignado puede responder esta conversación'

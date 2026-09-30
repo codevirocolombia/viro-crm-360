@@ -70,6 +70,8 @@ Rails.application.routes.draw do
           resource :superadmin_configuration, only: [:show, :update] do
             post :reset
           end
+
+          resource :call_center_configuration, only: [:show, :update]
           namespace :captain do
             resource :preferences, only: [:show, :update]
             resources :assistants do

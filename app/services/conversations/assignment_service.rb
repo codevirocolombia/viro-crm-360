@@ -125,10 +125,11 @@ def account_user_can_override?(account_user)
   return false if account_user.blank?
 
   account_user.administrator? ||
-    account_user.supervisor? ||
-    %w[administrator supervisor].include?(account_user.role.to_s) ||
-    account_user.permissions.include?('administrator') ||
-    account_user.permissions.include?('supervisor')
+  account_user.supervisor? ||
+  account_user.call_center? ||
+  %w[administrator supervisor call_center].include?(account_user.role.to_s) ||
+  account_user.permissions.include?('administrator') ||
+  account_user.permissions.include?('supervisor')
 end
 
   def unlimited_assignment_user?(user)

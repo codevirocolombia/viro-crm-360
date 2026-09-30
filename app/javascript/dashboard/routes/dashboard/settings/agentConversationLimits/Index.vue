@@ -62,7 +62,7 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
     <template #header>
       <BaseSettingsHeader
         title="Límites de conversaciones"
-        description="Define cuántas conversaciones activas puede tener asignadas cada agente. Los supervisores no tienen límite."
+        description="Define cuántas conversaciones activas puede tener asignadas cada agente y Call Center. Los supervisores no tienen límite."
       />
     </template>
 
@@ -92,14 +92,21 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
           </div>
 
           <span
-          v-if="agent.role === 'supervisor'"
-          class="w-20 justify-self-end text-center text-sm font-medium text-n-slate-11"
-            >
-              Supervisor
+            v-if="agent.role === 'supervisor'"
+            class="w-20 justify-self-end text-center text-sm font-medium text-n-slate-11"
+          >
+            Supervisor
+          </span>
+
+          <span
+            v-else-if="agent.role === 'call_center'"
+            class="w-28 justify-self-end text-center text-sm font-medium text-n-slate-11"
+          >
+             Call Center
           </span>
 
           <select
-            v-else
+            v-if="agent.role !== 'supervisor'"
             class="w-28 h-8 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
             :value="agent.conversation_assignment_limit ?? ''"
             :disabled="isUpdating(agent.id)"

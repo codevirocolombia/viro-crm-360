@@ -13,16 +13,19 @@ json.name resource.name
 json.provider resource.provider
 json.pubsub_token resource.pubsub_token
 json.custom_attributes resource.custom_attributes if resource.custom_attributes.present?
-active_role = if resource.active_account_user&.supervisor? ||
-                 resource.active_account_user&.call_center?
+
+active_account_user = resource.active_account_user
+active_role = if active_account_user&.supervisor? || active_account_user&.call_center?
                 'agent'
               else
-                resource.active_account_user&.role
+                active_account_user&.role
               end
+
 json.role active_role
 json.ui_settings resource.ui_settings
 json.uid resource.uid
 json.type resource.type
+
 json.accounts do
   json.array! resource.account_users do |account_user|
     json.id account_user.account_id
@@ -30,15 +33,16 @@ json.accounts do
     json.status account_user.account.status
     json.onboarding_step account_user.account.onboarding_step
     json.active_at account_user.active_at
-    json.role if account_user.supervisor? || account_user.call_center?
-            'agent'
-          else
-            account_user.role
-          end
+
+    account_role = if account_user.supervisor? || account_user.call_center?
+                     'agent'
+                   else
+                     account_user.role
+                   end
+
+    json.role account_role
     json.permissions account_user.permissions
-    # the actual availability user has configured
     json.availability account_user.availability
-    # availability derived from presence
     json.availability_status account_user.availability_status
     json.auto_offline account_user.auto_offline
     json.partial! 'api/v1/models/account_user', account_user: account_user if ChatwootApp.enterprise?

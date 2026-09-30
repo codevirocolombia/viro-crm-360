@@ -4,6 +4,13 @@ class ConfigLoader
     reconcile_only_new: true
   }.freeze
 
+  PRESERVED_SUPERADMIN_CONFIGS = %w[
+    INSTALLATION_NAME
+    LOGO
+    LOGO_DARK
+    LOGO_THUMBNAIL
+  ].freeze
+
   def process(options = {})
     options = DEFAULT_OPTIONS.merge(options)
     # function of the "reconcile_only_new" flag
@@ -46,13 +53,18 @@ class ConfigLoader
   end
 
   def save_general_config(existing, latest)
-    if existing
-      # save config only if reconcile flag is false and existing configs value does not match default value
-      save_as_new_config(latest) if !@reconcile_only_new && compare_values(existing, latest)
-    else
-      save_as_new_config(latest)
-    end
+  if existing
+    return if preserved_superadmin_config?(existing, latest)
+
+    save_as_new_config(latest) if !@reconcile_only_new && compare_values(existing, latest)
+  else
+    save_as_new_config(latest)
   end
+end
+
+def preserved_superadmin_config?(existing, latest)
+  PRESERVED_SUPERADMIN_CONFIGS.include?(latest[:name]) && !existing.locked?
+end
 
   def compare_values(existing, latest)
     existing.value != latest[:value] ||

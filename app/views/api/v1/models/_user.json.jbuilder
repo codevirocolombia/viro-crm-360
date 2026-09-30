@@ -13,7 +13,12 @@ json.name resource.name
 json.provider resource.provider
 json.pubsub_token resource.pubsub_token
 json.custom_attributes resource.custom_attributes if resource.custom_attributes.present?
-active_role = resource.active_account_user&.supervisor? ? 'agent' : resource.active_account_user&.role
+active_role = if resource.active_account_user&.supervisor? ||
+                 resource.active_account_user&.call_center?
+                'agent'
+              else
+                resource.active_account_user&.role
+              end
 json.role active_role
 json.ui_settings resource.ui_settings
 json.uid resource.uid
@@ -25,7 +30,11 @@ json.accounts do
     json.status account_user.account.status
     json.onboarding_step account_user.account.onboarding_step
     json.active_at account_user.active_at
-    json.role account_user.supervisor? ? 'agent' : account_user.role
+    json.role if account_user.supervisor? || account_user.call_center?
+            'agent'
+          else
+            account_user.role
+          end
     json.permissions account_user.permissions
     # the actual availability user has configured
     json.availability account_user.availability

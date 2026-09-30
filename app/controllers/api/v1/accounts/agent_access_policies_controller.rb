@@ -5,7 +5,7 @@ class Api::V1::Accounts::AgentAccessPoliciesController < Api::V1::Accounts::Base
   def index
     users = Current.account.account_users
                            .includes(:user)
-                           .where(role: [:agent, :supervisor])
+                           .where(role: [:agent, :supervisor, :call_center])
                            .map(&:user)
 
     render json: {

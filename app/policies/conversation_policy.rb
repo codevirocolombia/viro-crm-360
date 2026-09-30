@@ -22,7 +22,7 @@ end
   end
 
   def supervisor?
-  account_user&.supervisor?
+    account_user&.supervisor? || account_user&.call_center?
   end
 
   def agent_bot?

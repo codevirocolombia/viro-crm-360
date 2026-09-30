@@ -47,6 +47,10 @@ const isACustomBrandedInstance = useMapGetter(
 const isRTL = useMapGetter('accounts/isRTL');
 const currentUser = useMapGetter('getCurrentUser');
 const isSuperAdmin = computed(() => currentUser.value?.type === 'SuperAdmin');
+const currentRole = useMapGetter('getCurrentRole');
+const isAdministrator = computed(
+  () => currentRole.value === 'administrator'
+);
 
 const { width: windowWidth } = useWindowSize();
 const isMobile = computed(() => windowWidth.value < 768);
@@ -687,6 +691,17 @@ const menuItems = computed(() => {
   activeOn: ['agent_conversation_limits_index'],
   to: accountScopedRoute('agent_conversation_limits_index'),
 },
+...(isAdministrator.value
+  ? [
+      {
+        name: 'Settings Call Center',
+        label: 'Call Center',
+        icon: 'i-lucide-headphones',
+        activeOn: ['call_center_configuration_index'],
+        to: accountScopedRoute('call_center_configuration_index'),
+      },
+    ]
+  : []),
 ...(isSuperAdmin.value
   ? [
       {

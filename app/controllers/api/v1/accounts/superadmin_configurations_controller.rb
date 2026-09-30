@@ -104,10 +104,11 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
   end
 
   def update_config(name, value)
-    config = InstallationConfig.find_or_initialize_by(name: name)
-    config.locked = false if config.new_record?
-    config.value = value
-    config.save!
+  config = InstallationConfig.find_or_initialize_by(name: name)
+  config.locked = false
+  config.value = value
+  config.save!
+end
   end
 
   def current_config_payload

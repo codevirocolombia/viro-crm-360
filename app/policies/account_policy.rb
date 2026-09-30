@@ -38,6 +38,9 @@ class AccountPolicy < ApplicationPolicy
   private
 
   def staff_user?
-    @account_user.administrator? || @account_user.agent? || @account_user.supervisor?
+    @account_user.administrator? ||
+      @account_user.agent? ||
+      @account_user.supervisor? ||
+      @account_user.call_center?
   end
 end

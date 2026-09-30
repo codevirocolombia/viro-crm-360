@@ -164,7 +164,10 @@ end
   end
 
   def should_assign_conversation?
-    @conversation.status == 'open' && Current.user.is_a?(User) && Current.account_user&.agent?
+  return false unless @conversation.status == 'open' && Current.user.is_a?(User)
+
+  account_user = Current.account_user
+  account_user&.agent? || account_user&.call_center?
   end
 
   def toggle_priority
@@ -212,13 +215,13 @@ def ensure_conversation_accessible_on_open!
   return unless Current.user.is_a?(User)
 
   account_user = Current.account_user
-  return unless account_user&.agent? || account_user&.supervisor?
+  return unless account_user&.agent? || account_user&.supervisor? || account_user&.call_center?
   return if @conversation.assignee_id == Current.user.id
 
   if @conversation.assignee_id.present?
-    # El supervisor puede abrir conversaciones asignadas a otros agentes,
-    # sin modificar su asignación.
-    return if account_user.supervisor?
+    # Supervisores y Call Center pueden abrir conversaciones de otros
+    # sin modificar la asignación actual.
+    return if account_user.supervisor? || account_user.call_center?
 
     render json: { error: 'Esta conversación ya está asignada a otro agente' }, status: :forbidden
     return

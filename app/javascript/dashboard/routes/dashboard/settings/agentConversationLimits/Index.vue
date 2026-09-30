@@ -25,6 +25,7 @@ const limitOptions = computed(() => [
     value: '',
   },
 ]);
+
 onMounted(() => {
   store.dispatch('agents/get');
 });
@@ -45,7 +46,9 @@ const updateLimit = async (agent, event) => {
   } catch {
     useAlert('No se pudo actualizar el límite');
   } finally {
-    updatingAgentIds.value = updatingAgentIds.value.filter(id => id !== agent.id);
+    updatingAgentIds.value = updatingAgentIds.value.filter(
+      id => id !== agent.id
+    );
   }
 };
 
@@ -71,9 +74,9 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
         <div
           v-for="agent in visibleUsers"
           :key="agent.id"
-          class="grid grid-cols-[minmax(0,1fr)_80px] items-center gap-4 py-4"
+          class="grid grid-cols-[minmax(0,1fr)_112px] items-center gap-4 py-4"
         >
-          <div class="flex items-center gap-4 min-w-0">
+          <div class="flex min-w-0 items-center gap-4">
             <Avatar
               :src="agent.thumbnail"
               :name="agent.name"
@@ -81,11 +84,12 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
               :size="40"
               hide-offline-status
             />
+
             <div class="min-w-0">
-              <div class="text-heading-3 text-n-slate-12 truncate">
+              <div class="text-heading-3 truncate text-n-slate-12">
                 {{ agent.name }}
               </div>
-              <div class="text-body-main text-n-slate-11 truncate">
+              <div class="text-body-main truncate text-n-slate-11">
                 {{ agent.email }}
               </div>
             </div>
@@ -93,32 +97,25 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
 
           <span
             v-if="agent.role === 'supervisor'"
-            class="w-20 justify-self-end text-center text-sm font-medium text-n-slate-11"
+            class="w-28 justify-self-end text-center text-sm font-medium text-n-slate-11"
           >
             Supervisor
           </span>
 
-          <span
-            v-else-if="agent.role === 'call_center'"
-            class="w-28 justify-self-end text-center text-sm font-medium text-n-slate-11"
-          >
-             Call Center
-          </span>
-
           <select
-            v-if="agent.role !== 'supervisor'"
-            class="w-28 h-8 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
+            v-else
+            class="h-8 w-28 justify-self-end rounded-lg border border-n-weak bg-n-alpha-1 px-2 text-sm text-n-slate-12 outline-none"
             :value="agent.conversation_assignment_limit ?? ''"
             :disabled="isUpdating(agent.id)"
             @change="updateLimit(agent, $event)"
           >
-<option
-  v-for="limit in limitOptions"
-  :key="limit.value === '' ? 'unlimited' : limit.value"
-  :value="limit.value"
->
-  {{ limit.label }}
-</option>
+            <option
+              v-for="limit in limitOptions"
+              :key="limit.value === '' ? 'unlimited' : limit.value"
+              :value="limit.value"
+            >
+              {{ limit.label }}
+            </option>
           </select>
         </div>
       </div>

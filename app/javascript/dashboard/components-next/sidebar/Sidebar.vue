@@ -387,6 +387,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    /*
     {
       name: 'Captain',
       icon: 'i-woot-captain',
@@ -458,6 +459,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
     {
       name: 'Contacts',
       label: t('SIDEBAR.CONTACTS'),
@@ -577,6 +579,7 @@ const menuItems = computed(() => {
       icon: 'i-lucide-kanban',
       to: accountScopedRoute('kanban'),
     },
+    /*
     {
       name: 'Campaigns',
       label: t('SIDEBAR.CAMPAIGNS'),
@@ -599,6 +602,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
     {
       name: 'Portals',
       label: t('SIDEBAR.HELP_CENTER.TITLE'),
@@ -761,12 +765,14 @@ const menuItems = computed(() => {
           icon: 'i-lucide-repeat',
           to: accountScopedRoute('automation_list'),
         },
+        /*
         {
           name: 'Settings Agent Bots',
           label: t('SIDEBAR.AGENT_BOTS'),
           icon: 'i-lucide-bot',
           to: accountScopedRoute('agent_bots'),
         },
+        */
         {
           name: 'Settings Macros',
           label: t('SIDEBAR.MACROS'),
@@ -785,6 +791,7 @@ const menuItems = computed(() => {
           icon: 'i-lucide-blocks',
           to: accountScopedRoute('settings_applications'),
         },
+        /*
         {
           name: 'Settings Audit Logs',
           label: t('SIDEBAR.AUDIT_LOGS'),
@@ -803,12 +810,14 @@ const menuItems = computed(() => {
           icon: 'i-lucide-clock-alert',
           to: accountScopedRoute('sla_list'),
         },
+        */
         {
           name: 'Conversation Workflow',
           label: t('SIDEBAR.CONVERSATION_WORKFLOW'),
           icon: 'i-lucide-workflow',
           to: accountScopedRoute('conversation_workflow_index'),
         },
+        /*
         {
           name: 'Settings Security',
           label: t('SIDEBAR.SECURITY'),
@@ -821,6 +830,7 @@ const menuItems = computed(() => {
           icon: 'i-lucide-credit-card',
           to: accountScopedRoute('billing_settings_index'),
         },
+        */
       ],
     },
   ];

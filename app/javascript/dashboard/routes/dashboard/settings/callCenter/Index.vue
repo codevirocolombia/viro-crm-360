@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useAlert } from 'dashboard/composables';
 import SettingsLayout from '../SettingsLayout.vue';
 import BaseSettingsHeader from '../components/BaseSettingsHeader.vue';
@@ -7,6 +7,9 @@ import callCenterConfigurationAPI from 'dashboard/api/callCenterConfiguration';
 
 const isLoading = ref(false);
 const isSaving = ref(false);
+
+let refreshInterval = null;
+let isRefreshing = false;
 
 const configuration = ref({
   release_delay_seconds: 60,
@@ -19,17 +22,32 @@ const form = ref({
 
 const callCenters = computed(() => configuration.value.call_centers || []);
 
-const loadConfiguration = async () => {
-  isLoading.value = true;
+const loadConfiguration = async ({
+  showLoading = true,
+  syncForm = true,
+  silent = false,
+} = {}) => {
+  if (isRefreshing) return;
+
+  isRefreshing = true;
+  if (showLoading) isLoading.value = true;
 
   try {
     const response = await callCenterConfigurationAPI.get();
     configuration.value = response.data;
-    form.value.release_delay_seconds = response.data.release_delay_seconds;
+
+    // Solo al cargar inicialmente o guardar; el refresco no altera un campo
+    // que el administrador pueda estar editando.
+    if (syncForm) {
+      form.value.release_delay_seconds = response.data.release_delay_seconds;
+    }
   } catch {
-    useAlert('No se pudo cargar la configuración de Call Center');
+    if (!silent) {
+      useAlert('No se pudo cargar la configuración de Call Center');
+    }
   } finally {
-    isLoading.value = false;
+    if (showLoading) isLoading.value = false;
+    isRefreshing = false;
   }
 };
 
@@ -69,7 +87,23 @@ const statusClass = callCenter => {
   return 'bg-green-100 text-green-800';
 };
 
-onMounted(loadConfiguration);
+onMounted(() => {
+  loadConfiguration();
+
+  refreshInterval = window.setInterval(() => {
+    loadConfiguration({
+      showLoading: false,
+      syncForm: false,
+      silent: true,
+    });
+  }, 5000);
+});
+
+onBeforeUnmount(() => {
+  if (refreshInterval) {
+    window.clearInterval(refreshInterval);
+  }
+});
 </script>
 
 <template>

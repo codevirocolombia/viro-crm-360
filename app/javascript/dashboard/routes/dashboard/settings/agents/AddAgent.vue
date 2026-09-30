@@ -44,6 +44,11 @@ const roles = computed(() => {
     label: 'Supervisor',
   },
   {
+    id: 'call_center',
+    name: 'call_center',
+    label: 'Call Center',
+  },
+  {
     id: 'agent',
     name: 'agent',
     label: t('AGENT_MGMT.AGENT_TYPES.AGENT'),

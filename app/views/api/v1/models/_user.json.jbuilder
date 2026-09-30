@@ -14,14 +14,15 @@ json.provider resource.provider
 json.pubsub_token resource.pubsub_token
 json.custom_attributes resource.custom_attributes if resource.custom_attributes.present?
 
-active_account_user = resource.active_account_user
-active_role = if active_account_user&.supervisor? || active_account_user&.call_center?
-                'agent'
-              else
-                active_account_user&.role
-              end
+frontend_role = lambda do |account_user|
+  if account_user&.supervisor? || account_user&.call_center?
+    'agent'
+  else
+    account_user&.role
+  end
+end
 
-json.role active_role
+json.role frontend_role.call(resource.active_account_user)
 json.ui_settings resource.ui_settings
 json.uid resource.uid
 json.type resource.type
@@ -33,14 +34,7 @@ json.accounts do
     json.status account_user.account.status
     json.onboarding_step account_user.account.onboarding_step
     json.active_at account_user.active_at
-
-    account_role = if account_user.supervisor? || account_user.call_center?
-                     'agent'
-                   else
-                     account_user.role
-                   end
-
-    json.role account_role
+    json.role frontend_role.call(account_user)
     json.permissions account_user.permissions
     json.availability account_user.availability
     json.availability_status account_user.availability_status

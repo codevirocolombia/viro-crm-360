@@ -27,6 +27,16 @@ class Api::V1::Accounts::Conversations::BaseController < Api::V1::Accounts::Base
 
   return unless @conversation.status == 'open'
 
+  claim_policy = CallCenter::ConversationClaimPolicy.new(
+  conversation: @conversation,
+  account_user: account_user
+)
+
+unless claim_policy.allowed?
+  render json: { error: claim_policy.error_message }, status: :forbidden
+  return
+end
+
   assign_conversation_for_view
 rescue Conversations::AssignmentService::AssignmentError => e
   render json: { error: e.message }, status: :forbidden

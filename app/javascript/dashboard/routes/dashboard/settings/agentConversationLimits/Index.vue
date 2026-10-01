@@ -74,7 +74,7 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
         <div
           v-for="agent in visibleUsers"
           :key="agent.id"
-          class="grid grid-cols-[minmax(0,1fr)_112px] items-center gap-4 py-4"
+          class="grid grid-cols-[minmax(0,1fr)_140px_112px] items-center gap-4 py-4"
         >
           <div class="flex min-w-0 items-center gap-4">
             <Avatar
@@ -94,6 +94,14 @@ const isUpdating = agentId => updatingAgentIds.value.includes(agentId);
               </div>
             </div>
           </div>
+
+          <span
+  v-if="agent.role === 'call_center'"
+  class="text-center text-sm font-medium text-n-slate-11"
+>
+  Call Center
+</span>
+<span v-else></span>
 
           <span
             v-if="agent.role === 'supervisor'"

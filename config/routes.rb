@@ -71,7 +71,9 @@ Rails.application.routes.draw do
             post :reset
           end
 
-          resource :call_center_configuration, only: [:show, :update]
+          resource :call_center_configuration, only: [:show, :update] do
+  get :status
+end
           namespace :captain do
             resource :preferences, only: [:show, :update]
             resources :assistants do

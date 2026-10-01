@@ -64,9 +64,9 @@ class CallCenter::ConversationClaimPolicy
     active_count < limit
   end
 
-  def priority_period_finished?
-    conversation.created_at <= now - release_delay_seconds.seconds
-  end
+def priority_period_finished?
+  conversation.updated_at <= now - release_delay_seconds.seconds
+end
 
   def release_delay_seconds
     value = account.custom_attributes&.fetch(

@@ -12,6 +12,7 @@ import UnreadBadge from 'dashboard/components-next/Conversation/ConversationCard
 import SLACardLabel from './components/SLACardLabel.vue';
 import VoiceCallStatus from './VoiceCallStatus.vue';
 import Checkbox from 'dashboard/components-next/checkbox/Checkbox.vue';
+import CallCenterPriorityIndicator from './CallCenterPriorityIndicator.vue';
 
 const props = defineProps({
   chat: { type: Object, required: true },
@@ -218,6 +219,8 @@ watch(
         class="absolute flex flex-col ltr:right-3 rtl:left-3"
         :class="showMetaSection ? 'top-8' : 'top-4'"
       >
+        <CallCenterPriorityIndicator :chat="chat" class="mb-1 ltr:ml-auto rtl:mr-auto" />
+        
         <span class="ml-auto font-normal leading-4 text-xxs">
           <TimeAgo
             :last-activity-timestamp="chat.timestamp"

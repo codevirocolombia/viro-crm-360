@@ -7,6 +7,10 @@ class CallCenterConfigurationAPI extends ApiClient {
     super('call_center_configuration', { accountScoped: true });
   }
 
+  status() {
+  return axios.get(`${this.url}/status`);
+}
+
   update(data) {
     return axios.patch(this.url, data);
   }

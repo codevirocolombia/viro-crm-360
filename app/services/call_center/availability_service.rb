@@ -11,6 +11,18 @@ class CallCenter::AvailabilityService
     call_center_users.map { |account_user| user_payload(account_user) }
   end
 
+  def any_call_center?
+  call_center_users.exists?
+end
+
+def any_available_call_center?
+  call_center_users.any? do |account_user|
+    assigned_count = active_conversation_count(account_user)
+
+    in_shift?(account_user) && has_capacity?(account_user, assigned_count)
+  end
+end
+
   private
 
   attr_reader :account, :now

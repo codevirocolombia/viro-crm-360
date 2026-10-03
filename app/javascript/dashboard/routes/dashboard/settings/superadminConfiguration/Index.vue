@@ -7,7 +7,6 @@ import superadminConfigurationAPI from 'dashboard/api/superadminConfiguration';
 
 const isLoading = ref(false);
 const isSaving = ref(false);
-const isResetting = ref(false);
 
 const form = ref({
   installation_name: '',
@@ -90,9 +89,13 @@ const saveConfiguration = async () => {
 
   const formData = new FormData();
   formData.append('installation_name', form.value.installation_name || '');
+
   featureFields.forEach(feature => {
-  formData.append(feature.key, form.value[feature.key] ? 'true' : 'false');
-});
+    formData.append(
+      feature.key,
+      form.value[feature.key] ? 'true' : 'false'
+    );
+  });
 
   Object.entries(files.value).forEach(([key, file]) => {
     if (file) formData.append(key, file);
@@ -100,6 +103,7 @@ const saveConfiguration = async () => {
 
   try {
     const response = await superadminConfigurationAPI.update(formData);
+
     form.value = response.data;
     files.value = {
       logo: null,
@@ -120,37 +124,6 @@ const saveConfiguration = async () => {
   }
 };
 
-const resetConfiguration = async () => {
-  const confirmed = window.confirm(
-    '¿Seguro que quieres restaurar el nombre, logos y favicon por defecto?'
-  );
-
-  if (!confirmed) return;
-
-  isResetting.value = true;
-
-  try {
-    const response = await superadminConfigurationAPI.reset();
-    form.value = response.data;
-    files.value = {
-      logo: null,
-      logo_dark: null,
-      logo_thumbnail: null,
-    };
-
-    useAlert('Configuración restaurada correctamente');
-    reloadAfterChange();
-  } catch (error) {
-    useAlert(
-      error?.response?.data?.error ||
-        error?.response?.data?.message ||
-        'No se pudo restaurar la configuración'
-    );
-  } finally {
-    isResetting.value = false;
-  }
-};
-
 onMounted(loadConfiguration);
 </script>
 
@@ -168,7 +141,7 @@ onMounted(loadConfiguration);
 
     <template #body>
       <form
-        class="flex flex-col gap-6 border-t border-n-weak pt-6 w-full max-w-4xl"
+        class="flex w-full max-w-4xl flex-col gap-6 border-t border-n-weak pt-6"
         @submit.prevent="saveConfiguration"
       >
         <section class="rounded-lg border border-n-weak bg-n-solid-1 p-5">
@@ -176,6 +149,7 @@ onMounted(loadConfiguration);
             <span class="text-sm font-semibold text-n-slate-12">
               Nombre del CRM
             </span>
+
             <input
               v-model="form.installation_name"
               type="text"
@@ -194,12 +168,13 @@ onMounted(loadConfiguration);
               <h2 class="text-sm font-semibold text-n-slate-12">
                 {{ asset.title }}
               </h2>
+
               <p class="mt-1 text-xs leading-5 text-n-slate-11">
                 {{ asset.description }}
               </p>
             </div>
 
-            <div class="flex items-center gap-4 min-w-0">
+            <div class="flex min-w-0 items-center gap-4">
               <div
                 class="flex items-center justify-center rounded-md border border-n-weak p-3"
                 :class="[
@@ -210,7 +185,11 @@ onMounted(loadConfiguration);
                 <img
                   v-if="form[asset.key]"
                   :src="form[asset.key]"
-                  :class="asset.isFavicon ? 'size-10 object-contain' : 'max-h-14 max-w-32 object-contain'"
+                  :class="
+                    asset.isFavicon
+                      ? 'size-10 object-contain'
+                      : 'max-h-14 max-w-32 object-contain'
+                  "
                 />
               </div>
 
@@ -218,6 +197,7 @@ onMounted(loadConfiguration);
                 <p class="truncate text-sm font-medium text-n-slate-12">
                   {{ files[asset.key]?.name || 'Archivo actual' }}
                 </p>
+
                 <p class="text-xs text-n-slate-11">
                   PNG, JPG, SVG, WEBP o ICO
                 </p>
@@ -232,6 +212,7 @@ onMounted(loadConfiguration);
                 class="hidden"
                 @change="handleFileChange(asset.key, $event)"
               />
+
               <label
                 :for="`superadmin-${asset.key}`"
                 class="inline-flex h-9 cursor-pointer items-center justify-center rounded-md border border-n-weak bg-n-alpha-2 px-3 text-sm font-medium text-n-slate-12 transition-colors hover:bg-n-alpha-3"
@@ -243,63 +224,60 @@ onMounted(loadConfiguration);
         </section>
 
         <section class="rounded-lg border border-n-weak bg-n-solid-1 p-5">
-  <div class="mb-4">
-    <h2 class="text-sm font-semibold text-n-slate-12">
-      Funciones del CRM
-    </h2>
-    <p class="mt-1 text-xs leading-5 text-n-slate-11">
-      Activa o desactiva módulos completos para esta instalación.
-    </p>
-  </div>
+          <div class="mb-4">
+            <h2 class="text-sm font-semibold text-n-slate-12">
+              Funciones del CRM
+            </h2>
 
-  <div class="divide-y divide-n-weak">
-    <div
-      v-for="feature in featureFields"
-      :key="feature.key"
-      class="flex items-center justify-between gap-4 py-4"
-    >
-      <div>
-        <h3 class="text-sm font-semibold text-n-slate-12">
-          {{ feature.title }}
-        </h3>
-        <p class="mt-1 text-xs leading-5 text-n-slate-11">
-          {{ feature.description }}
-        </p>
-      </div>
+            <p class="mt-1 text-xs leading-5 text-n-slate-11">
+              Activa o desactiva módulos completos para esta instalación.
+            </p>
+          </div>
 
-      <button
-        type="button"
-        role="switch"
-        :aria-checked="form[feature.key]"
-        class="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors"
-        :class="form[feature.key] ? 'bg-[#1f93ff]' : 'bg-n-alpha-3'"
-        @click="form[feature.key] = !form[feature.key]"
-      >
-        <span
-          class="inline-block size-5 rounded-full bg-white transition-transform"
-          :class="form[feature.key] ? 'translate-x-6' : 'translate-x-1'"
-        />
-      </button>
-    </div>
-  </div>
-</section>
+          <div class="divide-y divide-n-weak">
+            <div
+              v-for="feature in featureFields"
+              :key="feature.key"
+              class="flex items-center justify-between gap-4 py-4"
+            >
+              <div>
+                <h3 class="text-sm font-semibold text-n-slate-12">
+                  {{ feature.title }}
+                </h3>
+
+                <p class="mt-1 text-xs leading-5 text-n-slate-11">
+                  {{ feature.description }}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="form[feature.key]"
+                class="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors"
+                :class="
+                  form[feature.key] ? 'bg-[#1f93ff]' : 'bg-n-alpha-3'
+                "
+                @click="form[feature.key] = !form[feature.key]"
+              >
+                <span
+                  class="inline-block size-5 rounded-full bg-white transition-transform"
+                  :class="
+                    form[feature.key] ? 'translate-x-6' : 'translate-x-1'
+                  "
+                />
+              </button>
+            </div>
+          </div>
+        </section>
 
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="submit"
             class="h-10 rounded-md bg-[#1f93ff] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#1a7edb] disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="isSaving || isResetting"
+            :disabled="isSaving"
           >
             {{ isSaving ? 'Guardando...' : 'Guardar cambios' }}
-          </button>
-
-          <button
-            type="button"
-            class="h-10 rounded-md border border-n-weak bg-n-alpha-2 px-4 text-sm font-semibold text-n-slate-12 transition-colors hover:bg-n-alpha-3 disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="isSaving || isResetting"
-            @click="resetConfiguration"
-          >
-            {{ isResetting ? 'Restaurando...' : 'Restaurar valores por defecto' }}
           </button>
         </div>
       </form>

@@ -10,10 +10,6 @@ class SuperadminConfigurationAPI extends ApiClient {
   update(data) {
     return axios.patch(this.url, data);
   }
-
-  reset() {
-    return axios.post(`${this.url}/reset`);
-  }
 }
 
 export default new SuperadminConfigurationAPI();

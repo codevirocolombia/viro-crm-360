@@ -62,8 +62,8 @@ class ConfigLoader
   end
 end
 
-def preserved_superadmin_config?(existing, latest)
-  PRESERVED_SUPERADMIN_CONFIGS.include?(latest[:name]) && !existing.locked?
+def preserved_superadmin_config?(_existing, latest)
+  PRESERVED_SUPERADMIN_CONFIGS.include?(latest[:name])
 end
 
   def compare_values(existing, latest)

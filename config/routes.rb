@@ -67,9 +67,7 @@ Rails.application.routes.draw do
             delete 'sessions/:session_id', action: :destroy_session
             end
           end
-          resource :superadmin_configuration, only: [:show, :update] do
-            post :reset
-          end
+          resource :superadmin_configuration, only: [:show, :update]
 
           resource :call_center_configuration, only: [:show, :update] do
   get :status

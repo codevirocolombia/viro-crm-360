@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import { useMapGetter } from 'dashboard/composables/store';
 import { useCallCenterPriority } from 'dashboard/composables/useCallCenterPriority';
 
 const props = defineProps({
@@ -9,9 +10,12 @@ const props = defineProps({
   },
 });
 
+const currentUser = useMapGetter('getCurrentUser');
 const { priorityFor } = useCallCenterPriority();
 
-const priority = computed(() => priorityFor(props.chat));
+const priority = computed(() =>
+  priorityFor(props.chat, currentUser.value?.id)
+);
 
 const circumference = 50.27;
 
@@ -19,12 +23,35 @@ const dashOffset = computed(
   () => circumference * (1 - Math.min(1, Math.max(0, priority.value.progress)))
 );
 
-const tooltip = computed(() => {
-  if (priority.value.waiting) {
-    return `Call Center tiene prioridad por ${priority.value.remainingSeconds} segundos`;
+const color = computed(() => {
+  switch (priority.value.state) {
+    case 'assigned_to_current_user':
+      return '#1f93ff';
+    case 'assigned_to_other_user':
+    case 'waiting':
+      return '#ef4444';
+    case 'available':
+      return '#22c55e';
+    default:
+      return '#6b7280';
   }
+});
 
-  return 'Disponible para agentes y supervisores';
+const tooltip = computed(() => {
+  switch (priority.value.state) {
+    case 'assigned_to_current_user':
+      return 'Esta conversación está asignada a ti';
+    case 'assigned_to_other_user':
+      return 'Esta conversación está asignada a otra persona';
+    case 'waiting':
+      return `Call Center tiene prioridad por ${priority.value.remainingSeconds} segundos`;
+    case 'available':
+      return 'Disponible para agentes y supervisores';
+    case 'inactive':
+      return 'Conversación no disponible para asignación';
+    default:
+      return 'Consultando estado de Call Center';
+  }
 });
 </script>
 
@@ -53,12 +80,12 @@ const tooltip = computed(() => {
         cy="10"
         r="8"
         fill="none"
-        :stroke="priority.waiting ? '#ef4444' : '#22c55e'"
+        :stroke="color"
         stroke-width="2.5"
         stroke-linecap="round"
         :stroke-dasharray="circumference"
         :stroke-dashoffset="dashOffset"
-        class="transition-[stroke-dashoffset] duration-1000 ease-linear"
+        class="transition-[stroke-dashoffset,stroke] duration-1000 ease-linear"
       />
     </svg>
 

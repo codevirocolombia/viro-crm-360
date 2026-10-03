@@ -33,8 +33,7 @@ const refreshStatus = async () => {
     receivedAt.value = Date.now();
     localTime.value = Date.now();
   } catch {
-    // Conserva el último estado válido para no ocultar el indicador
-    // ante un error temporal de red.
+    // Conserva el último estado válido ante un error temporal de red.
   } finally {
     requestInProgress = false;
   }
@@ -81,13 +80,42 @@ export const useCallCenterPriority = () => {
     stopPolling();
   });
 
-  const priorityFor = conversation => {
-    if (
-      !status.value.loaded ||
-      conversation.status !== 'open' ||
-      conversation.meta?.assignee
-    ) {
-      return { visible: false };
+  const priorityFor = (conversation, currentUserId) => {
+    const assignee = conversation.meta?.assignee;
+
+    if (assignee) {
+      const assignedToCurrentUser =
+        String(assignee.id) === String(currentUserId);
+
+      return {
+        visible: true,
+        state: assignedToCurrentUser
+          ? 'assigned_to_current_user'
+          : 'assigned_to_other_user',
+        waiting: false,
+        remainingSeconds: 0,
+        progress: 1,
+      };
+    }
+
+    if (!status.value.loaded) {
+      return {
+        visible: true,
+        state: 'loading',
+        waiting: false,
+        remainingSeconds: 0,
+        progress: 0,
+      };
+    }
+
+    if (conversation.status !== 'open') {
+      return {
+        visible: true,
+        state: 'inactive',
+        waiting: false,
+        remainingSeconds: 0,
+        progress: 1,
+      };
     }
 
     const hasPriorityCallCenter =
@@ -102,6 +130,7 @@ export const useCallCenterPriority = () => {
     if (!delay || !startedAt) {
       return {
         visible: true,
+        state: 'available',
         waiting: false,
         remainingSeconds: 0,
         progress: 1,
@@ -117,6 +146,7 @@ export const useCallCenterPriority = () => {
 
     return {
       visible: true,
+      state: waiting ? 'waiting' : 'available',
       waiting,
       remainingSeconds,
       progress: waiting ? (delay - remainingSeconds) / delay : 1,

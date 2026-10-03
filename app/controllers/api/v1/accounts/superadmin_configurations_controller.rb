@@ -56,14 +56,6 @@ class Api::V1::Accounts::SuperadminConfigurationsController < Api::V1::Accounts:
     render json: current_config_payload
   end
 
-  def reset
-    DEFAULT_CONFIG.each do |key, value|
-      update_config(CONFIG_KEYS[key], value)
-    end
-
-    render json: current_config_payload
-  end
-
     private
 
   def ensure_superadmin!
